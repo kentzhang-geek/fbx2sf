@@ -9,5 +9,6 @@
 #include "scene.h"
 
 bool fileToSceneBuffer(std::string filename, std::string &buffer);
+flatbuffers::Offset<Scene> fileToFBSScene(std::string filename, flatbuffers::FlatBufferBuilder & builder);
 
 #endif //RPD_FBX_PLUGIN_FILETOSCENE_H

@@ -17,7 +17,7 @@ link_libraries(zlib-md)
 #set(CMAKE_CXX_LINK_LIBRARY_FLAG  ${CMAKE_CXX_LINK_LIBRARY_FLAG} /NODEFAULTLIB:library)
 
 set(SRC
-        src/main.cpp
         src/fileToScene.cpp src/fileToScene.h src/ParseNode.cpp src/ParseNode.h src/ParseMesh.cpp src/ParseMesh.h)
 
-add_executable(test ${SRC})
+add_executable(test ${SRC} src/main.cpp src/interface.cpp src/interface.h src/macro.h)
+add_library(${PROJECT_NAME} ${SRC} src/interface.cpp src/interface.h)
