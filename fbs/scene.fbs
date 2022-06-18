@@ -1,0 +1,4 @@
+include "bvh_accel.fbs";
+
+table Scene {
+}

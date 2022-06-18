@@ -1,0 +1,6 @@
+include "common.fbs";
+
+table BVHAccel {
+}
+
+root_type BVHAccel;

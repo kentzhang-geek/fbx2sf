@@ -1,0 +1,11 @@
+/// this flatbuffer scheme described all basic data structure that needs serialization
+struct Vec3d {
+    x : float64;
+    y : float64;
+    z : float64;
+}
+
+struct BoundingBox {
+    p_min : Vec3d;
+    p_max : Vec3d;
+}

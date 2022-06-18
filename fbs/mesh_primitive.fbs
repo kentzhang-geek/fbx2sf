@@ -1,0 +1,10 @@
+include "common.fbs";
+
+struct TriangleIndexTuple {
+    idx : [int32:3];
+}
+
+table MeshPrimitive {
+    vertexs : [Vec3d];
+    triangles : [TriangleIndexTuple];
+}
