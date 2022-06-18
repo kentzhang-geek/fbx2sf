@@ -1,6 +1,13 @@
 include "common.fbs";
+include "mesh_primitive.fbs";
 
-table BVHAccel {
+table BVHNode {
+    name : string(required);
+    children : [BVHNode];
+    meshes : [MeshPrimitive];
+    local_transform : Matrix44d(required);
+    /// for convenient
+    global_transform : Matrix44d;
 }
 
-root_type BVHAccel;
+root_type BVHNode;

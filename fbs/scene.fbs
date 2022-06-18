@@ -1,4 +1,7 @@
 include "bvh_accel.fbs";
 
 table Scene {
+    root : BVHNode;
 }
+
+root_type Scene;

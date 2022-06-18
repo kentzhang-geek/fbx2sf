@@ -123,3 +123,4 @@ SDK/
 cmake-build-relwithdebinfo/
 cmake-build*/
 .idea/
+samplefbx/
