@@ -19,5 +19,5 @@ link_libraries(zlib-md)
 set(SRC
         src/fileToScene.cpp src/fileToScene.h src/ParseNode.cpp src/ParseNode.h src/ParseMesh.cpp src/ParseMesh.h)
 
-add_executable(test ${SRC} src/main.cpp src/interface.cpp src/interface.h src/macro.h)
+add_executable(test ${SRC} src/main.cpp src/interface.cpp src/interface.h src/macro.h src/sceneToFile.cpp src/sceneToFile.h)
 add_library(${PROJECT_NAME} ${SRC} src/interface.cpp src/interface.h)

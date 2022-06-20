@@ -14,9 +14,22 @@ Matrix44d FbxAMaxtirxToFlatbuffersMatrix(FbxAMatrix am) {
     return Matrix44d(flatbuffers::make_span({row0, row1, row2, row3}));
 }
 
-flatbuffers::Offset<BVHNode> ParseNode(FbxNode *node, flatbuffers::FlatBufferBuilder &builder) {
-    BVHNodeBuilder bvhbuilder(builder);
-    bvhbuilder.add_name(builder.CreateString(node->GetName()));
+FbxVector4 DumpVec4d(Vec4d v) {
+    return FbxVector4(v.x(), v.y(), v.z(), v.w());
+}
+
+FbxAMatrix DumpTransform(Matrix44d m) {
+    FbxAMatrix ret;
+    for (int i = 0; i < 4; ++i) {
+        auto v = DumpVec4d(*m.idx()->Get(i));
+        ret.SetRow(i, v);
+    }
+    return ret;
+}
+
+std::unique_ptr<BVHNodeT> ParseNode(FbxNode *node) {
+    std::unique_ptr<BVHNodeT> ret(new BVHNodeT());
+    ret->name.assign(node->GetName());
     std::vector<flatbuffers::Offset<MeshPrimitive>> meshes;
     // parse self
     for (int i = 0; i < node->GetNodeAttributeCount(); ++i) {
@@ -25,22 +38,46 @@ flatbuffers::Offset<BVHNode> ParseNode(FbxNode *node, flatbuffers::FlatBufferBui
             // Attribute to mesh
             FbxMesh *mesh = FbxCast<FbxMesh>(attri);
             if (mesh) {
-                meshes.push_back(ParseMesh(mesh, builder));
+                ret->meshes.push_back(ParseMesh(mesh));
             }
         }
     }
-    bvhbuilder.add_meshes(builder.CreateVector(meshes));
     // translation
     auto m = FbxAMaxtirxToFlatbuffersMatrix(node->EvaluateLocalTransform());
-    bvhbuilder.add_local_transform(&m);
+    ret->local_transform.reset(new Matrix44d(m));
     m = FbxAMaxtirxToFlatbuffersMatrix(node->EvaluateGlobalTransform());
-    bvhbuilder.add_global_transform(&m);
+    ret->global_transform.reset(new Matrix44d(m));
     // parse children
-    std::vector<flatbuffers::Offset<BVHNode>> children;
     for (int i = 0; i < node->GetChildCount(); ++i) {
-        auto child = ParseNode(node->GetChild(i), builder);
-        children.push_back(child);
+        ret->children.push_back(ParseNode(node->GetChild(i)));
     }
-    bvhbuilder.add_children(builder.CreateVector(children));
-    return bvhbuilder.Finish();
+    return ret;
+}
+
+bool DumpNode(const BVHNode *node, FbxNode *fbxout, FbxManager *fbxsdkMan) {
+    fbxout->SetName(node->name()->c_str());
+    // local transform
+    FbxAMatrix localM = DumpTransform(*node->local_transform());
+    fbxout->LclTranslation = localM.GetT();
+    fbxout->LclRotation = localM.GetR();
+    fbxout->LclScaling = localM.GetS();
+    // parse meshes
+    if (node->meshes()) {
+        for (int i = 0; i < node->meshes()->size(); ++i) {
+            const MeshPrimitive *m = node->meshes()->Get(i);
+            FbxMesh *newmesh = FbxMesh::Create(fbxsdkMan, "");
+            DumpMesh(newmesh, m, fbxsdkMan);
+            fbxout->AddNodeAttribute(newmesh);
+        }
+    }
+    // parse children
+    if (node->children()) {
+        for (int i = 0; i < node->children()->size(); ++i) {
+            const BVHNode *n = node->children()->Get(i);
+            FbxNode *newfbxnode = FbxNode::Create(fbxsdkMan, n->name()->c_str());
+            DumpNode(n, newfbxnode, fbxsdkMan);
+            fbxout->AddChild(newfbxnode);
+        }
+    }
+    return true;
 }

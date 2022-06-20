@@ -11,7 +11,7 @@
 #include "ParseNode.h"
 
 
-flatbuffers::Offset<Scene> fileToFBSScene(std::string filename, flatbuffers::FlatBufferBuilder & builder) {
+std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBufferBuilder & builder) {
     FbxManager *lSdkManager = FbxManager::Create();
 
     // Create the IO settings object.
@@ -39,21 +39,14 @@ flatbuffers::Offset<Scene> fileToFBSScene(std::string filename, flatbuffers::Fla
     bool cret = converter.Triangulate(lScene, true, false);
 
     // convert to flatbuffers
-    auto scene = CreateScene(builder, ParseNode(lScene->GetRootNode(), builder));
+    auto scene = new SceneT();
+    scene->root = ParseNode(lScene->GetRootNode());
 
     lScene->Destroy();
 
     // The file is imported, so get rid of the importer.
     lImporter->Destroy();
 
-    return scene;
+    return std::unique_ptr<SceneT>(scene);
 }
 
-bool fileToSceneBuffer(std::string filename, std::string &buffer) {
-    flatbuffers::FlatBufferBuilder builder;
-    auto scene = fileToFBSScene(filename, builder);
-    builder.Finish(scene);
-    buffer.assign((char *)builder.GetBufferPointer(), builder.GetSize());
-
-    return true;
-}

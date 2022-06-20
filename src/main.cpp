@@ -5,13 +5,14 @@
 #include "interface.h"
 
 int main() {
-    std::string buffer;
 //    fileToSceneBuffer("samplefbx/source/scene.fbx", buffer);
-    int size;
+    int datasize;
     std::string path = "samplefbx/source/scene.fbx";
-    fileToSceneBuffer((char *)path.c_str(), path.size(), &size);
-//    printf("size is %d\n", buffer.size());
-    printf("size is %d\n", size);
+    char * buffer = fileToSceneBuffer((char *)path.c_str(), path.size(), &datasize);
+//    printf("datasize is %d\n", buffer.datasize());
+    printf("datasize is %d\n", datasize);
+    std::string fpath = "outtest.fbx";
+    sceneBufferToFile((char *)fpath.c_str(), fpath.size(), buffer, datasize);
 
     return 0;
 }

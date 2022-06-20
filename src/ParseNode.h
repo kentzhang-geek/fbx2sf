@@ -10,7 +10,8 @@
 #include "bvh_accel.h"
 #include "fbxsdk.h"
 
-flatbuffers::Offset<BVHNode> ParseNode(FbxNode * node, flatbuffers::FlatBufferBuilder & builder);
+std::unique_ptr<BVHNodeT> ParseNode(FbxNode * node);
+bool DumpNode(const BVHNode * node, FbxNode * fbxout, FbxManager * fbxsdkMan);
 
 
 #endif //RPD_FBX_PLUGIN_PARSENODE_H

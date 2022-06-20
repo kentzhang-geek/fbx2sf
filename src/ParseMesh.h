@@ -9,7 +9,8 @@
 #include "bvh_accel.h"
 #include "fbxsdk.h"
 
-flatbuffers::Offset<MeshPrimitive> ParseMesh(FbxMesh * mesh, flatbuffers::FlatBufferBuilder & builder);
+std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh);
+bool DumpMesh(FbxMesh * mesh, const MeshPrimitive * mp, FbxManager * fbxsdkMan);
 
 
 #endif //RPD_FBX_PLUGIN_PARSEMESH_H

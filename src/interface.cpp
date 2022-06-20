@@ -4,21 +4,32 @@
 
 #include "interface.h"
 #include "fileToScene.h"
+#include "sceneToFile.h"
 
-static flatbuffers::FlatBufferBuilder sta_builder;
 
 extern "C" char *fileToSceneBuffer(char *filename, int pathlen, int *size_len) {
+    flatbuffers::FlatBufferBuilder builder;
     std::string filepath(filename, pathlen);
     printf("get file %s\n", filepath.c_str());
     fflush(stdout);
-    sta_builder = flatbuffers::FlatBufferBuilder();
-    auto scene = fileToFBSScene(filepath, sta_builder);
-    sta_builder.Finish(scene);
-    *size_len = sta_builder.GetSize();
+    auto scene = fileToFBSScene(filepath, builder);
+    builder.Finish(Scene::Pack(builder, scene.get()));
+    *size_len = builder.GetSize();
+    void * ret_ptr = malloc(builder.GetSize());
+    memcpy(ret_ptr, builder.GetBufferPointer(), builder.GetSize());
 
-    return (char *) (sta_builder.GetBufferPointer());
+    return (char *)ret_ptr;
 }
 
 void printHello() {
     printf("Hello!\n");
+}
+
+bool sceneBufferToFile(char *filename, int pathlen, char *buffer, int size_len) {
+    std::string filepath(filename, pathlen);
+    printf("get file %s\n", filepath.c_str());
+    flatbuffers::Verifier vr((uint8_t *)buffer, (size_t)size_len);
+    printf("verify flatbuffers data input %d\n", GetScene(buffer)->Verify(vr));
+    fflush(stdout);
+    return sceneToFile(filepath, (Scene *) GetScene(buffer));
 }

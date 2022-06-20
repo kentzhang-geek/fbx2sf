@@ -8,6 +8,7 @@
 #include "macro.h"
 
 EXTERN_C DLLEXPORT char * fileToSceneBuffer(char * filename, int pathlen, int * size_len);
+EXTERN_C DLLEXPORT bool sceneBufferToFile(char * filename, int pathlen, char * buffer, int size_len);
 EXTERN_C DLLEXPORT void printHello();
 
 
