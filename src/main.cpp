@@ -11,8 +11,10 @@ int main() {
     char * buffer = fileToSceneBuffer((char *)path.c_str(), path.size(), &datasize);
 //    printf("datasize is %d\n", buffer.datasize());
     printf("datasize is %d\n", datasize);
+    char * bufout = (char*)malloc(datasize);
+    memcpy(bufout, buffer, datasize);
     std::string fpath = "outtest.fbx";
-    sceneBufferToFile((char *)fpath.c_str(), fpath.size(), buffer, datasize);
+    sceneBufferToFile((char *)fpath.c_str(), fpath.size(), bufout, datasize);
 
     return 0;
 }
