@@ -22,4 +22,4 @@ set(SRC
 
 add_executable(test ${SRC} src/test.cpp)
 add_executable(fbx2sf ${SRC} src/main.cpp)
-add_library (${PROJECT_NAME} ${SRC})
+add_library(fbxplugin ${SRC})

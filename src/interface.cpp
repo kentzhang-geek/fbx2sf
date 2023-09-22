@@ -7,7 +7,7 @@
 #include "sceneToFile.h"
 
 
-extern "C" char *fileToSceneBuffer(char *filename, int pathlen, int *size_len) {
+extern "C" char *fbxFileToSceneBuffer(char *filename, int pathlen, int *size_len) {
     flatbuffers::FlatBufferBuilder builder;
     std::string filepath(filename, pathlen);
     printf("get file %s\n", filepath.c_str());
@@ -21,11 +21,7 @@ extern "C" char *fileToSceneBuffer(char *filename, int pathlen, int *size_len) {
     return (char *)ret_ptr;
 }
 
-void printHello() {
-    printf("Hello!\n");
-}
-
-bool sceneBufferToFile(char *filename, int pathlen, char *buffer, int size_len) {
+bool sceneBufferToFbxFile(char *filename, int pathlen, char *buffer, int size_len) {
     std::string filepath(filename, pathlen);
     printf("get file %s\n", filepath.c_str());
     flatbuffers::Verifier vr((uint8_t *)buffer, (size_t)size_len);
