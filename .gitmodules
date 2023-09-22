@@ -1,0 +1,4 @@
+[submodule "scene_flat"]
+	path = scene_flat
+	url = git@github.com:kentzhang-geek/scene_flat.git
+	branch = main

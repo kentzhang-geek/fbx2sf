@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
-project(rpd_fbx_plugin)
-include_directories(fbs_generated)
+project(fbx2sf)
+include_directories(scene_flat/generated/cpp)
 
 # for flatbuffers
 include_directories(SDK/flatbuffers/include)
@@ -17,7 +17,9 @@ link_libraries(zlib-md)
 #set(CMAKE_CXX_LINK_LIBRARY_FLAG  ${CMAKE_CXX_LINK_LIBRARY_FLAG} /NODEFAULTLIB:library)
 
 set(SRC
-        src/fileToScene.cpp src/fileToScene.h src/ParseNode.cpp src/ParseNode.h src/ParseMesh.cpp src/ParseMesh.h)
+        src/fileToScene.cpp src/fileToScene.h src/ParseNode.cpp src/ParseNode.h src/ParseMesh.cpp src/ParseMesh.h
+        src/interface.cpp src/interface.h src/macro.h src/sceneToFile.cpp src/sceneToFile.h)
 
-add_executable(test ${SRC} src/main.cpp src/interface.cpp src/interface.h src/macro.h src/sceneToFile.cpp src/sceneToFile.h)
-add_library(${PROJECT_NAME} ${SRC} src/interface.cpp src/interface.h)
+add_executable(test ${SRC} src/test.cpp)
+add_executable(fbx2sf ${SRC} src/main.cpp)
+add_library (${PROJECT_NAME} ${SRC})
