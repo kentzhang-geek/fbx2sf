@@ -5,11 +5,9 @@
 #include "interface.h"
 
 int main() {
-//    fileToSceneBuffer("samplefbx/source/scene.fbx", buffer);
     int datasize;
     std::string path = "samplefbx/source/scene.fbx";
     char * buffer = fbxFileToSceneBuffer((char *)path.c_str(), path.size(), &datasize);
-//    printf("datasize is %d\n", buffer.datasize());
     printf("datasize is %d\n", datasize);
     char * bufout = (char*)malloc(datasize);
     memcpy(bufout, buffer, datasize);

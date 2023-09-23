@@ -23,7 +23,7 @@ extern "C" char *fbxFileToSceneBuffer(char *filename, int pathlen, int *size_len
 
 bool sceneBufferToFbxFile(char *filename, int pathlen, char *buffer, int size_len) {
     std::string filepath(filename, pathlen);
-    printf("get file %s\n", filepath.c_str());
+    printf("get file %s and length %d\n", filepath.c_str(), size_len);
     flatbuffers::Verifier vr((uint8_t *)buffer, (size_t)size_len);
     printf("verify flatbuffers data input %d\n", GetScene(buffer)->Verify(vr));
     fflush(stdout);
