@@ -42,6 +42,18 @@ std::unique_ptr<BVHNodeT> ParseNode(FbxNode *node) {
             }
         }
     }
+    // parse material : TODO
+    if (node->GetMaterialCount() > 0) {
+        printf("material count: %d\n", node->GetMaterialCount());
+        FbxSurfaceMaterial * mat = node->GetMaterial(0);
+        printf("material name %s\n", mat->GetName());
+        FbxSurfacePhong * phong = FbxCast<FbxSurfacePhong>(mat);
+        printf("Phong mat unique id %d\n", phong->GetUniqueID());
+        FbxFileTexture * tex = FbxCast<FbxFileTexture>(phong->Diffuse.GetSrcObject());
+        if (tex) {
+            printf("Texture name %s\n", tex->GetFileName());
+        }
+    }
     // translation
     auto m = FbxAMaxtirxToFlatbuffersMatrix(node->EvaluateLocalTransform());
     ret->local_transform.reset(new Matrix44d(m));

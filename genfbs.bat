@@ -1,3 +1,3 @@
-git submodule update --recursive --remote
-cd scene_flat && python gen.py -cpp
+Rem git submodule update --recursive --remote
+cd scene_flat_dev && python gen.py -cpp
 pause

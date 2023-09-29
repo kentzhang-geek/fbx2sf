@@ -11,6 +11,7 @@ bool sceneToFile(std::string filename, Scene *scene) {
 
     // Create the IO settings object.
     FbxIOSettings *ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+    ios->SetBoolProp(EXP_FBX_EMBEDDED, true);
     lSdkManager->SetIOSettings(ios);
 
     // Create an exporter.

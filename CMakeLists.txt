@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(fbx2sf)
-include_directories(scene_flat/generated/cpp)
+# include_directories(scene_flat/generated/cpp) # for deploy compiling
+include_directories(scene_flat_dev/generated/cpp) # for dev compiling
 
 # for flatbuffers
 include_directories(SDK/flatbuffers/include)
