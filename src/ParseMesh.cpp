@@ -88,8 +88,9 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
         ExtractAttributesToSceneFlatMesh(ecolor, ret->colors, mesh);
     }
     // tex coord for diffuse
-    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureDiffuse) == 1) {
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureDiffuse) >= 1) {
         FbxGeometryElementUV *etex = mesh->GetElementUV(0, fbxsdk::FbxLayerElement::eTextureDiffuse);
+        ret->diffuseTexCoord = std::make_unique<MeshTexCoordsT>();
         if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByControlPoint) {
             ret->diffuseTexCoord->texCoordMapMode = AttributeMapMode_eByVertex;
         } else if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByPolygonVertex) {
@@ -98,13 +99,15 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
             printf("unsupported tex coord mapping mode detected?\n");
         }
         ExtractAttributesToSceneFlatMesh(etex, ret->diffuseTexCoord->texCoords, mesh);
-    } else if (mesh->GetElementUVCount() > 1) {
+    }
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureDiffuse) > 1) {
         // multiple tex coord detected
-        printf("Multiple diffuse tex coord detected\n");
+        printf("Multiple diffuse tex coord detected %d\n", mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureDiffuse));
     }
     // specular tex coord
-    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureSpecular) == 1) {
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureSpecular) >= 1) {
         FbxGeometryElementUV *etex = mesh->GetElementUV(0, fbxsdk::FbxLayerElement::eTextureSpecular);
+        ret->specularTexCoord = std::make_unique<MeshTexCoordsT>();
         if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByControlPoint) {
             ret->specularTexCoord->texCoordMapMode = AttributeMapMode_eByVertex;
         } else if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByPolygonVertex) {
@@ -113,13 +116,15 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
             printf("unsupported tex coord mapping mode detected?\n");
         }
         ExtractAttributesToSceneFlatMesh(etex, ret->specularTexCoord->texCoords, mesh);
-    } else if (mesh->GetElementUVCount() > 1) {
+    }
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureSpecular) > 1) {
         // multiple tex coord detected
-        printf("Multiple specular tex coord detected\n");
+        printf("Multiple specular tex coord detected %d\n", mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureSpecular));
     }
     // ambient tex coord
-    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureAmbient) == 1) {
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureAmbient) >= 1) {
         FbxGeometryElementUV *etex = mesh->GetElementUV(0, fbxsdk::FbxLayerElement::eTextureAmbient);
+        ret->ambientTexCoord = std::make_unique<MeshTexCoordsT>();
         if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByControlPoint) {
             ret->ambientTexCoord->texCoordMapMode = AttributeMapMode_eByVertex;
         } else if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByPolygonVertex) {
@@ -128,13 +133,15 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
             printf("unsupported tex coord mapping mode detected?\n");
         }
         ExtractAttributesToSceneFlatMesh(etex, ret->ambientTexCoord->texCoords, mesh);
-    } else if (mesh->GetElementUVCount() > 1) {
+    }
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureAmbient) > 1) {
         // multiple tex coord detected
-        printf("Multiple ambient tex coord detected\n");
+        printf("Multiple ambient tex coord detected %d\n", mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureAmbient));
     }
     // normal tex coord
-    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureNormalMap) == 1) {
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureNormalMap) >= 1) {
         FbxGeometryElementUV *etex = mesh->GetElementUV(0, fbxsdk::FbxLayerElement::eTextureNormalMap);
+        ret->normalTexCoord = std::make_unique<MeshTexCoordsT>();
         if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByControlPoint) {
             ret->normalTexCoord->texCoordMapMode = AttributeMapMode_eByVertex;
         } else if (etex->GetMappingMode() == fbxsdk::FbxLayerElement::eByPolygonVertex) {
@@ -143,9 +150,10 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
             printf("unsupported tex coord mapping mode detected?\n");
         }
         ExtractAttributesToSceneFlatMesh(etex, ret->normalTexCoord->texCoords, mesh);
-    } else if (mesh->GetElementUVCount() > 1) {
+    }
+    if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureNormalMap) > 1) {
         // multiple tex coord detected
-        printf("Multiple normal tex coord detected\n");
+        printf("Multiple normal tex coord detected %d\n", mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureNormalMap));
     }
     // normal
     if (mesh->GetElementNormalCount() == 1) {
@@ -161,6 +169,19 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
     } else if (mesh->GetElementNormalCount() > 1) {
         // multiple normal detected
         printf("Multiple normal detected\n");
+    }
+    // parse material
+    if (mesh->GetElementMaterialCount() == 1) {
+        FbxLayerElementMaterial * meshMat = mesh->GetElementMaterial(0);
+        if (meshMat->GetMappingMode() == fbxsdk::FbxLayerElement::eAllSame) {
+            FbxSurfaceMaterial* lMaterial = mesh->GetNode()->GetMaterial(meshMat->GetIndexArray().GetAt(0));
+            ret->materialIdx = lMaterial->GetUniqueID();
+        } else {
+            printf("unsupported mapping mode %d\n", meshMat->GetMappingMode()); // TODO : support other mapping mode
+        }
+    }
+    if (mesh->GetElementMaterialCount() > 1) { // TODO : support multi material
+        printf("unsupported material count: %d\n", mesh->GetElementMaterialCount());
     }
     return ret;
 }

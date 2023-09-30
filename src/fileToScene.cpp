@@ -40,6 +40,10 @@ std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBu
 
     // convert to flatbuffers
     auto scene = new SceneT();
+    // TODO: parse material first
+    int rcount = lScene->GetMaterialCount();
+    printf("root material count %d\n", rcount);
+    // parse node and mesh
     scene->root = ParseNode(lScene->GetRootNode());
 
     lScene->Destroy();
