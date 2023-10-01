@@ -5,10 +5,12 @@
 #include "scene.h"
 #include "fbxsdk.h"
 #include "fileToScene.h"
+#include "material.h"
 #include <iostream>
 #include <string>
 #include <stdio.h>
 #include "ParseNode.h"
+#include "PraseMaterial.h"
 
 
 std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBufferBuilder & builder) {
@@ -41,8 +43,11 @@ std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBu
     // convert to flatbuffers
     auto scene = new SceneT();
     // TODO: parse material first
-    int rcount = lScene->GetMaterialCount();
-    printf("root material count %d\n", rcount);
+    for (int i = 0; i < lScene->GetMaterialCount(); i++) {
+        FbxSurfaceMaterial * m = lScene->GetMaterial(i);
+        scene->materials.push_back(ParseMaterial(m));
+    }
+
     // parse node and mesh
     scene->root = ParseNode(lScene->GetRootNode());
 

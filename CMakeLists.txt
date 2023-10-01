@@ -19,8 +19,11 @@ link_libraries(zlib-md)
 
 set(SRC
         src/fileToScene.cpp src/fileToScene.h src/ParseNode.cpp src/ParseNode.h src/ParseMesh.cpp src/ParseMesh.h
-        src/interface.cpp src/interface.h src/macro.h src/sceneToFile.cpp src/sceneToFile.h)
+        src/interface.cpp src/interface.h src/macro.h src/sceneToFile.cpp src/sceneToFile.h
+        src/PraseMaterial.cpp
+        src/PraseMaterial.h)
 
 add_executable(test ${SRC} src/test.cpp)
-add_executable(fbx2sf ${SRC} src/main.cpp)
+add_executable(fbx2sf ${SRC} src/main.cpp
+        src/tool.h)
 add_library(fbxplugin ${SRC})

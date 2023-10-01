@@ -75,18 +75,6 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
             printf("Encounter Non Triangle Polygon!\n");
         }
     }
-    // colors
-    if (mesh->GetElementVertexColorCount() == 1) {
-        FbxGeometryElementVertexColor *ecolor = mesh->GetElementVertexColor(0);
-        if (ecolor->GetMappingMode() == fbxsdk::FbxLayerElement::eByControlPoint) {
-            ret->colorMapMode = AttributeMapMode_eByVertex;
-        } else if (ecolor->GetMappingMode() == fbxsdk::FbxLayerElement::eByPolygonVertex) {
-            ret->colorMapMode = AttributeMapMode_eByIndex;
-        } else {
-            printf("unsupported color mapping mode detected?\n");
-        }
-        ExtractAttributesToSceneFlatMesh(ecolor, ret->colors, mesh);
-    }
     // tex coord for diffuse
     if (mesh->GetElementUVCount(fbxsdk::FbxLayerElement::eTextureDiffuse) >= 1) {
         FbxGeometryElementUV *etex = mesh->GetElementUV(0, fbxsdk::FbxLayerElement::eTextureDiffuse);
