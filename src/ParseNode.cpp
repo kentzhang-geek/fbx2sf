@@ -38,8 +38,6 @@ std::unique_ptr<BVHNodeT> ParseNode(FbxNode *node) {
             // Attribute to mesh
             FbxMesh *mesh = FbxCast<FbxMesh>(attri);
             if (mesh) {
-                int mcount = mesh->GetElementMaterialCount();
-                printf("mesh material count %d\n", mcount);
                 ret->meshes.push_back(ParseMesh(mesh));
             }
         }

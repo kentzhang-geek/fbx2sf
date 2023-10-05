@@ -45,7 +45,6 @@ static inline std::vector<uint8_t> && ReadFileContent(std::string file_name) {
         return {};
     }
     std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(ifs), {});
-    RTP_LOG("Read Texture file", file_name, buffer.size());
     return std::forward<std::vector<uint8_t>>(buffer);
 }
 

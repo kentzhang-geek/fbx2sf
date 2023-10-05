@@ -42,7 +42,7 @@ std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBu
 
     // convert to flatbuffers
     auto scene = new SceneT();
-    // TODO: parse material first
+    // parse material first
     for (int i = 0; i < lScene->GetMaterialCount(); i++) {
         FbxSurfaceMaterial * m = lScene->GetMaterial(i);
         scene->materials.push_back(ParseMaterial(m));
