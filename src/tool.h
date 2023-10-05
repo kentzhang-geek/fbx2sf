@@ -10,6 +10,10 @@
 #include "common.h"
 #include <iostream>
 #include <utility>
+#include <unordered_map>
+#include <boost/serialization/config.hpp>
+#include <boost/serialization/singleton.hpp>
+#include "fbxsdk.h"
 
 #define RTP_LOG(...) internel_cpp_printer(__VA_ARGS__)
 
@@ -47,5 +51,7 @@ static inline std::vector<uint8_t> && ReadFileContent(std::string file_name) {
     std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(ifs), {});
     return std::forward<std::vector<uint8_t>>(buffer);
 }
+
+typedef boost::serialization::singleton<std::unordered_map<uint64_t, FbxSurfaceMaterial*>> MaterialMapUniqueID;
 
 #endif //RPD_FBX_PLUGIN_TOOL_H

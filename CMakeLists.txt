@@ -8,6 +8,10 @@ include_directories(SDK/flatbuffers/include)
 link_directories(SDK/flatbuffers/lib)
 link_libraries(flatbuffers)
 
+# for boost
+include_directories(SDK/boost)
+link_directories(SDK/boost/stage/lib)
+
 # for FBX SDK
 include_directories(SDK/2020.3.1/include/)
 link_directories(SDK/2020.3.1/lib/vs2019/x64/release/)

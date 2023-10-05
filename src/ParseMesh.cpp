@@ -3,6 +3,7 @@
 //
 
 #include "ParseMesh.h"
+#include "tool.h"
 #pragma optimize("", off)
 
 
@@ -50,6 +51,41 @@ void ExtractAttributesToSceneFlatMesh(AttributeArray * attri, std::vector<VecTyp
     } else {
         printf("unsupported attribute mapping mode detected?\n");
     }
+}
+
+template <typename LayerElementType>
+void TemplatedAddVecForFbx(LayerElementType *layer, const Vec3d * v) {
+    layer->GetDirectArray().Add(FbxVector4(v->x(), v->y(), v->z(), 0.0));
+}
+
+template <typename LayerElementType>
+void TemplatedAddVecForFbx(LayerElementType *layer, const Vec2d * v) {
+    layer->GetDirectArray().Add(FbxVector2(v->x(), v->y()));
+}
+
+template <typename VecType>
+FbxGeometryElementUV * ConvertSFattributesToFbx(FbxMesh *owner, const MeshTexCoords *texCoords, FbxLayerElement::EType tType, char * uvname) {
+    FbxGeometryElementUV* lLayerElementUV = owner->CreateElementUV(uvname, tType);
+    lLayerElementUV->SetReferenceMode(fbxsdk::FbxLayerElement::eDirect);
+    switch (texCoords->texCoordMapMode()) {
+        case AttributeMapMode::AttributeMapMode_eByIndex : {
+            lLayerElementUV->SetMappingMode(fbxsdk::FbxLayerElement::eByPolygonVertex);
+            break;
+        }
+        case AttributeMapMode::AttributeMapMode_eByVertex : {
+            lLayerElementUV->SetMappingMode(fbxsdk::FbxLayerElement::eByControlPoint);
+            break;
+        }
+        default : {
+            printf("unsolved diffuse tex coord mapping mode detected\n");
+            break;
+        }
+    }
+    for (int i = 0; i < texCoords->texCoords()->size(); i++) {
+        auto n = texCoords->texCoords()->Get(i);
+        TemplatedAddVecForFbx(lLayerElementUV,n);
+    }
+    return lLayerElementUV;
 }
 
 
@@ -174,7 +210,7 @@ std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh) {
     return ret;
 }
 
-bool DumpMesh(FbxMesh *mesh, const MeshPrimitive *mp, FbxManager *fbxsdkMan) {
+bool DumpMesh(FbxMesh *mesh, const MeshPrimitive *mp, FbxManager *fbxsdkMan, FbxNode *node) {
     if (mp->vertexs()) {
         mesh->InitControlPoints(mp->vertexs()->size());
         for (int i = 0; i < mp->vertexs()->size(); ++i) {
@@ -183,10 +219,11 @@ bool DumpMesh(FbxMesh *mesh, const MeshPrimitive *mp, FbxManager *fbxsdkMan) {
             mesh->SetControlPointAt(pt, i);
         }
     }
+    // normal
     if (mp->normals()) {
         if (mesh->GetUVLayerCount() == 0)
             mesh->CreateLayer();
-        FbxLayerElementNormal *lLayerElementNormal = FbxLayerElementNormal::Create(mesh, "");
+        FbxLayerElementNormal *lLayerElementNormal = FbxLayerElementNormal::Create(mesh, "normal");
         for (int i = 0; i < mp->normals()->size(); i++) {
             auto n = mp->normals()->Get(i);
             lLayerElementNormal->GetDirectArray().Add(FbxVector4(n->x(), n->y(), n->z(), 0.0));
@@ -207,6 +244,7 @@ bool DumpMesh(FbxMesh *mesh, const MeshPrimitive *mp, FbxManager *fbxsdkMan) {
         }
         mesh->GetLayer(0)->SetNormals(lLayerElementNormal);
     }
+    // triangle indices
     if (mp->triangles()) {
         for (int i = 0; i < mp->triangles()->size(); ++i) {
             mesh->BeginPolygon();
@@ -216,6 +254,35 @@ bool DumpMesh(FbxMesh *mesh, const MeshPrimitive *mp, FbxManager *fbxsdkMan) {
             mesh->AddPolygon(tri->idx2());
             mesh->EndPolygon();
         }
+    }
+    // diffuse tex coord
+    if (mp->diffuseTexCoord()) {
+        if (mesh->GetUVLayerCount() == 0)
+            mesh->CreateLayer();
+        FbxLayerElementUV *lLayerElementUV = ConvertSFattributesToFbx<FbxLayerElementUV>(mesh,mp->diffuseTexCoord(), fbxsdk::FbxLayerElement::eTextureDiffuse, "diffuseUV");
+        mesh->GetLayer(0)->SetUVs(lLayerElementUV, fbxsdk::FbxLayerElement::eTextureDiffuse);
+    }
+    // ambient tex coord
+    if (mp->ambientTexCoord()) {
+        if (mesh->GetUVLayerCount() == 0)
+            mesh->CreateLayer();
+        FbxLayerElementUV *lLayerElementUV = ConvertSFattributesToFbx<FbxLayerElementUV>(mesh,mp->ambientTexCoord(), fbxsdk::FbxLayerElement::eTextureAmbient, "ambientUV");
+        mesh->GetLayer(0)->SetUVs(lLayerElementUV, fbxsdk::FbxLayerElement::eTextureAmbient);
+    }
+    // specular tex coord
+    if (mp->specularTexCoord()) {
+        if (mesh->GetUVLayerCount() == 0)
+            mesh->CreateLayer();
+        FbxLayerElementUV *lLayerElementUV = ConvertSFattributesToFbx<FbxLayerElementUV>(mesh,mp->specularTexCoord(), fbxsdk::FbxLayerElement::eTextureSpecular, "specularUV");
+        mesh->GetLayer(0)->SetUVs(lLayerElementUV, fbxsdk::FbxLayerElement::eTextureSpecular);
+    }
+    // material
+    if (mp->materialIdx()) {
+        FbxGeometryElementMaterial* lMaterialElement = mesh->CreateElementMaterial();
+        lMaterialElement->SetMappingMode(FbxGeometryElement::eAllSame);
+        lMaterialElement->SetReferenceMode(FbxGeometryElement::eDirect);
+        lMaterialElement->GetIndexArray().Add(0);
+        node->AddMaterial(MaterialMapUniqueID::get_const_instance().at(mp->materialIdx()));
     }
     return true;
 }

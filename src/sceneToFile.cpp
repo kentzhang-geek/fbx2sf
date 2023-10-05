@@ -5,6 +5,8 @@
 #include "sceneToFile.h"
 #include "fbxsdk.h"
 #include "ParseNode.h"
+#include "PraseMaterial.h"
+#include "tool.h"
 
 bool sceneToFile(std::string filename, Scene *scene) {
     FbxManager *lSdkManager = FbxManager::Create();
@@ -28,8 +30,16 @@ bool sceneToFile(std::string filename, Scene *scene) {
     // Create a new scene so that it can be populated by the imported file.
     FbxScene *lScene = FbxScene::Create(lSdkManager, "myScene");
 
+    // dump material
+    for (const Material * m : *scene->materials()) {
+        FbxSurfaceMaterial *mat = DumpMaterial(m, lScene);
+        lScene->AddMaterial(mat);
+        MaterialMapUniqueID::get_mutable_instance()[m->id()] = mat;
+    }
+
     // convert to scene
     DumpNode(scene->root(), lScene->GetRootNode(), lSdkManager);
+
 
     // Export the scene to the file.
     lExporter->Export(lScene);

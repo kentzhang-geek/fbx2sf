@@ -66,7 +66,7 @@ bool DumpNode(const BVHNode *node, FbxNode *fbxout, FbxManager *fbxsdkMan) {
         for (int i = 0; i < node->meshes()->size(); ++i) {
             const MeshPrimitive *m = node->meshes()->Get(i);
             FbxMesh *newmesh = FbxMesh::Create(fbxsdkMan, "");
-            DumpMesh(newmesh, m, fbxsdkMan);
+            DumpMesh(newmesh, m, fbxsdkMan, fbxout);
             fbxout->AddNodeAttribute(newmesh);
         }
     }

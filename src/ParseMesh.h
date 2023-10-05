@@ -10,7 +10,7 @@
 #include "fbxsdk.h"
 
 std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh);
-bool DumpMesh(FbxMesh * mesh, const MeshPrimitive * mp, FbxManager * fbxsdkMan);
+bool DumpMesh(FbxMesh * mesh, const MeshPrimitive * mp, FbxManager * fbxsdkMan, FbxNode *node);
 
 
 #endif //RPD_FBX_PLUGIN_PARSEMESH_H
