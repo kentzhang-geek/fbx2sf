@@ -4,28 +4,10 @@
 
 #include "ParseNode.h"
 #include "ParseMesh.h"
+#include "tool.h"
+#include "ParseCamera.h"
+#include "ParseLight.h"
 
-Matrix44d FbxAMaxtirxToFlatbuffersMatrix(FbxAMatrix am) {
-    Matrix44d ret;
-    Vec4d row0(am.Get(0, 0), am.Get(0, 1), am.Get(0, 2), am.Get(0, 3));
-    Vec4d row1(am.Get(1, 0), am.Get(1, 1), am.Get(1, 2), am.Get(1, 3));
-    Vec4d row2(am.Get(2, 0), am.Get(2, 1), am.Get(2, 2), am.Get(2, 3));
-    Vec4d row3(am.Get(3, 0), am.Get(3, 1), am.Get(3, 2), am.Get(3, 3));
-    return Matrix44d(flatbuffers::make_span({row0, row1, row2, row3}));
-}
-
-FbxVector4 DumpVec4d(Vec4d v) {
-    return FbxVector4(v.x(), v.y(), v.z(), v.w());
-}
-
-FbxAMatrix DumpTransform(Matrix44d m) {
-    FbxAMatrix ret;
-    for (int i = 0; i < 4; ++i) {
-        auto v = DumpVec4d(*m.idx()->Get(i));
-        ret.SetRow(i, v);
-    }
-    return ret;
-}
 
 std::unique_ptr<BVHNodeT> ParseNode(FbxNode *node) {
     std::unique_ptr<BVHNodeT> ret(new BVHNodeT());
@@ -34,11 +16,24 @@ std::unique_ptr<BVHNodeT> ParseNode(FbxNode *node) {
     // parse self
     for (int i = 0; i < node->GetNodeAttributeCount(); ++i) {
         auto attri = node->GetNodeAttributeByIndex(i);
-        if (attri->GetAttributeType() == fbxsdk::FbxNodeAttribute::eMesh) {
-            // Attribute to mesh
-            FbxMesh *mesh = FbxCast<FbxMesh>(attri);
-            if (mesh) {
-                ret->meshes.push_back(ParseMesh(mesh));
+        switch (attri->GetAttributeType()) {
+            case fbxsdk::FbxNodeAttribute::eMesh: {
+                FbxMesh *mesh = FbxCast<FbxMesh>(attri);
+                if (mesh) {
+                    ret->meshes.push_back(ParseMesh(mesh));
+                }
+            } break;
+            case fbxsdk::FbxNodeAttribute::eCamera: {
+                FbxCamera * cam = FbxCast<FbxCamera>(attri);
+                if (cam) {
+                    SceneSingleton::get_mutable_instance().value->cameras.push_back(ParseCamera(cam));
+                }
+            } break;
+            case fbxsdk::FbxNodeAttribute::eLight: {
+                FbxLight * light = FbxCast<FbxLight>(attri);
+                if (light) {
+                    SceneSingleton::get_mutable_instance().value->lights.push_back(ParseLight(light, node));
+                }
             }
         }
     }

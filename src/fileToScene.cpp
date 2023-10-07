@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "ParseNode.h"
 #include "PraseMaterial.h"
-
+#include "tool.h"
 
 std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBufferBuilder & builder) {
     FbxManager *lSdkManager = FbxManager::Create();
@@ -42,6 +42,8 @@ std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBu
 
     // convert to flatbuffers
     auto scene = new SceneT();
+    SceneSingleton::get_mutable_instance().value = scene;
+
     // parse material first
     for (int i = 0; i < lScene->GetMaterialCount(); i++) {
         FbxSurfaceMaterial * m = lScene->GetMaterial(i);
@@ -50,6 +52,12 @@ std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBu
 
     // parse node and mesh
     scene->root = ParseNode(lScene->GetRootNode());
+
+#ifdef DEBUG_MODE
+    FbxVector4 min, max, center;
+    lScene->GetRootNode()->EvaluateGlobalBoundingBoxMinMaxCenter(min, max, center);
+    RTP_LOG("Got bound box", to_string(min), to_string(max), to_string(center));
+#endif
 
     lScene->Destroy();
 

@@ -40,6 +40,11 @@ bool sceneToFile(std::string filename, Scene *scene) {
     // convert to scene
     DumpNode(scene->root(), lScene->GetRootNode(), lSdkManager);
 
+#ifdef DEBUG_MODE
+    FbxVector4 min, max, center;
+    lScene->GetRootNode()->EvaluateGlobalBoundingBoxMinMaxCenter(min, max, center);
+    RTP_LOG("Got bound box", to_string(min), to_string(max), to_string(center));
+#endif
 
     // Export the scene to the file.
     lExporter->Export(lScene);
