@@ -90,7 +90,7 @@ static inline FbxVector4 DumpVec4d(Vec4d v) {
 static inline FbxAMatrix DumpTransform(Matrix44d m) {
     FbxAMatrix ret;
     for (int i = 0; i < 4; ++i) {
-        auto v = DumpVec4d(*m.idx()->Get(i));
+        auto v = DumpVec4d(*m.rows()->Get(i));
         ret.SetRow(i, v);
     }
     return ret;
