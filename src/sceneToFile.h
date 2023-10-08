@@ -7,6 +7,8 @@
 
 #include "scene.h"
 
+using namespace sf;
+
 bool sceneToFile(std::string filename, Scene * scene);
 
 #endif //RPD_FBX_PLUGIN_SCENETOFILE_H

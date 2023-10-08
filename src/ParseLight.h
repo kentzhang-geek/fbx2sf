@@ -8,6 +8,8 @@
 #include "light.h"
 #include "fbxsdk.h"
 
+using namespace sf;
+
 std::unique_ptr<LightT> ParseLight(FbxLight *light, FbxNode *node);
 // TODO no dump for now
 

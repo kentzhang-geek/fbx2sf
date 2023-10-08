@@ -8,6 +8,8 @@
 #include <string>
 #include "scene.h"
 
+using namespace sf;
+
 std::unique_ptr<SceneT> fileToFBSScene(std::string filename, flatbuffers::FlatBufferBuilder & builder);
 
 #endif //RPD_FBX_PLUGIN_FILETOSCENE_H

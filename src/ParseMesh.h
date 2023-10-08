@@ -9,6 +9,8 @@
 #include "bvh_accel.h"
 #include "fbxsdk.h"
 
+using namespace sf;
+
 std::unique_ptr<MeshPrimitiveT> ParseMesh(FbxMesh *mesh);
 bool DumpMesh(FbxMesh * mesh, const MeshPrimitive * mp, FbxManager * fbxsdkMan, FbxNode *node);
 

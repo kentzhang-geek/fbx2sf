@@ -16,6 +16,8 @@
 #include <boost/serialization/singleton.hpp>
 #include "fbxsdk.h"
 
+using namespace sf;
+
 #define RTP_LOG(...) internel_cpp_printer(__VA_ARGS__)
 
 static inline void internel_cpp_printer() {
@@ -96,8 +98,10 @@ static inline FbxAMatrix DumpTransform(Matrix44d m) {
     return ret;
 }
 
-class SceneT;
-typedef boost::serialization::singleton<SingleContainer<SceneT *>> SceneSingleton;
+namespace sf {
+    struct SceneT;
+}
+typedef boost::serialization::singleton<SingleContainer<sf::SceneT *>> SceneSingleton;
 
 //#define DEBUG_MODE
 

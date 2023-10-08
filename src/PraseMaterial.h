@@ -12,6 +12,8 @@
 #include "fbxsdk.h"
 #include <unordered_map>
 
+using namespace sf;
+
 /**
  * Parse a PhongSurface from a FbxSurfacePhong
  * @param phong

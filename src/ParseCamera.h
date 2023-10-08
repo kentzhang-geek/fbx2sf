@@ -10,6 +10,8 @@
 #include "camera.h"
 #include "fbxsdk.h"
 
+using namespace sf;
+
 std::unique_ptr<CameraT> ParseCamera(FbxCamera *cam);
 
 

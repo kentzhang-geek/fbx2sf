@@ -10,6 +10,8 @@
 #include "bvh_accel.h"
 #include "fbxsdk.h"
 
+using namespace sf;
+
 std::unique_ptr<BVHNodeT> ParseNode(FbxNode * node);
 bool DumpNode(const BVHNode * node, FbxNode * fbxout, FbxManager * fbxsdkMan);
 
