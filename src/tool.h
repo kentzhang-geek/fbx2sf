@@ -43,16 +43,16 @@ static inline std::unique_ptr<Vec2d> MakeVec2d(double x, double y) {
     return std::make_unique<Vec2d>(x,y);
 };
 
-static inline std::vector<uint8_t> && ReadFileContent(std::string file_name) {
+static inline void ReadFileContent(std::string file_name, std::vector<uint8_t> &buffer) {
     // read file content to a byte vector
     std::ifstream ifs(file_name, std::ios::binary);
     if (!ifs.is_open())
     {
         RTP_LOG("Failed to open file:", file_name);
-        return {};
+        return ;
     }
-    std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(ifs), {});
-    return std::forward<std::vector<uint8_t>>(buffer);
+    buffer = std::vector<uint8_t>(std::istreambuf_iterator<char>(ifs), {});
+    return ;
 }
 
 static inline std::string to_string(FbxVector4 v) {

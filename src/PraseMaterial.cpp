@@ -40,8 +40,13 @@ std::unique_ptr<TextureT> ParseTexture(FbxFileTexture *tex) {
     std::unique_ptr<TextureT> ret(new TextureT());
     ret->id = tex->GetUniqueID();
     ret->file_name = tex->GetFileName();
+    ret->image_type = ImageType_eFileData;
     ret->media_name = std::string(tex->GetMediaName().Buffer(), tex->GetMediaName().Size());
-    ret->data = ReadFileContent(ret->file_name);
+    ReadFileContent(ret->file_name, ret->data);
+    if (ret->data.empty())
+    {
+        RTP_LOG("Empty texture?");
+    }
     if (texture_cache.count(ret->file_name) == 0) {
         texture_cache.insert(ret->file_name);
     } else {
